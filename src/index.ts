@@ -1,4 +1,3 @@
-
 document.querySelector<HTMLInputElement>('#filechooser').addEventListener('input', async ({ target }) => {
     const t = target as HTMLInputElement;
     const { files } = t;
@@ -29,8 +28,6 @@ document.querySelector<HTMLInputElement>('#filechooser').addEventListener('input
         reader.readAsDataURL(file);
     });
 
-
-
     const image = await new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
@@ -43,25 +40,42 @@ document.querySelector<HTMLInputElement>('#filechooser').addEventListener('input
     });
 
     // TODO: クロップ処理
-
+    // Galaxyにある#000000の余白とか
+    // 余裕があればAndroidエミュレーターのUI部分も
 
     const canvas = document.querySelector<HTMLCanvasElement>("#canvas");
     const ctx = canvas.getContext('2d');
+    // FIXME: x, yがanyになる
+    const canvasInfo = (() => {
+        if (image.width / image.height <= 16 / 9) {
+            // 16:9か
+            // 16:9より縦長
+            const canvasInfo = {
+                x: 0,
+                y: undefined,
+                width: image.width,
+                height: image.width * (9 / 16)
+            }
+            canvasInfo.y = -(image.height - canvasInfo.height) / 2;
+            return canvasInfo;
+        } else {
+            // 16:9より横長
+            const canvasInfo = {
+                x: undefined,
+                y: 0,
+                width: image.height * (16 / 9),
+                height: image.height,
+            }
+            // 右端
+            canvasInfo.x = -(image.width - canvasInfo.width);
+            return canvasInfo;
+        }
+    })()
 
-    const canvasInfo = {
-        x: 0,
-        y: undefined,
-        width: image.width,
-        height: image.width * (9 / 16)
-    }
-    canvasInfo.y = -(image.height - canvasInfo.height) / 2;
-    console.log(canvasInfo);
-
+    console.log("canvas info", canvasInfo);
     canvas.width = canvasInfo.width;
     canvas.height = canvasInfo.height;
     ctx.drawImage(image, canvasInfo.x, canvasInfo.y);
 
-
-
-
+    // TODO: Lv検出, 誓約検出, キャラ名検出, ランク検出, ステータスOCR, アイテム検出
 })
