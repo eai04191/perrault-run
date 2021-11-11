@@ -1,0 +1,14 @@
+{
+    "name": "perrault-run",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "Irie Aoi <eai@mizle.net>",
+    "license": "MIT",
+    "devDependencies": {
+        "parcel": "^2.0.1",
+        "prettier": "^2.4.1"
+    },
+    "dependencies": {
+        "tailwindcss": "^2.2.19"
+    }
+}
