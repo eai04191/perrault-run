@@ -1,9 +1,13 @@
 {
     "name": "perrault-run",
     "version": "1.0.0",
-    "main": "index.js",
+    "source": "src/index.html",
     "author": "Irie Aoi <eai@mizle.net>",
     "license": "MIT",
+    "scripts": {
+        "dev":"parcel",
+        "build":"parcel build"
+    },
     "devDependencies": {
         "parcel": "^2.0.1",
         "prettier": "^2.4.1"
