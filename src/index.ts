@@ -73,9 +73,42 @@ document.querySelector<HTMLInputElement>('#filechooser').addEventListener('input
     })()
 
     console.log("canvas info", canvasInfo);
-    canvas.width = canvasInfo.width;
+    // canvas.width = canvasInfo.width;
     canvas.height = canvasInfo.height;
-    ctx.drawImage(image, canvasInfo.x, canvasInfo.y);
+    // ctx.drawImage(image, canvasInfo.x, canvasInfo.y);
+
+    // 右半分だけ抽出
+    canvas.width = canvasInfo.width / 2;
+    ctx.drawImage(image, canvasInfo.x - canvasInfo.width / 2, canvasInfo.y);
+
+
+    binarization(canvas, 105)
 
     // TODO: Lv検出, 誓約検出, キャラ名検出, ランク検出, ステータスOCR, アイテム検出
 })
+
+/**
+ * 与えられたスレッショルドでcanvasのcontextを二値化する
+ * @license MIT License
+ * @preserve Copyright (c) 2019 Yoshiki Shinagawa
+ * @see https://tech-blog.s-yoshiki.com/entry/114
+ * @see https://github.com/s-yoshiki/Gasyori100knockJS/blob/master/src/components/questions/answers/Ans3.js
+ */
+function binarization(canvas: HTMLCanvasElement, threshold: number) {
+    const context = canvas.getContext('2d');
+    const src = context.getImageData(0, 0, canvas.width, canvas.height)
+    const dst = context.createImageData(canvas.width, canvas.height)
+    for (let i = 0; i < src.data.length; i += 4) {
+        let y = 0.2126 * src.data[i] + 0.7152 * src.data[i + 1] + 0.0722 * src.data[i + 2]
+        if (y > threshold) {
+            y = 255
+        } else {
+            y = 0
+        }
+        dst.data[i] = y
+        dst.data[i + 1] = y
+        dst.data[i + 2] = y
+        dst.data[i + 3] = src.data[i + 3]
+    }
+    context.putImageData(dst, 0, 0)
+}
