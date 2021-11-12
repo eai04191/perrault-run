@@ -50,25 +50,23 @@ document.querySelector<HTMLInputElement>('#filechooser').addEventListener('input
         if (image.width / image.height <= 16 / 9) {
             // 16:9か
             // 16:9より縦長
-            const canvasInfo = {
+            const height = image.width * (9 / 16)
+            return {
                 x: 0,
-                y: undefined,
+                y: -(image.height - height) / 2,
                 width: image.width,
-                height: image.width * (9 / 16)
+                height: height
             }
-            canvasInfo.y = -(image.height - canvasInfo.height) / 2;
-            return canvasInfo;
         } else {
             // 16:9より横長
-            const canvasInfo = {
-                x: undefined,
+            const width = image.height * (16 / 9)
+            return {
+                // 右端
+                x: -(image.width - width),
                 y: 0,
-                width: image.height * (16 / 9),
+                width: width,
                 height: image.height,
             }
-            // 右端
-            canvasInfo.x = -(image.width - canvasInfo.width);
-            return canvasInfo;
         }
     })()
 
