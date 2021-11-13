@@ -5,7 +5,7 @@
     "author": "Irie Aoi <eai@mizle.net>",
     "license": "MIT",
     "scripts": {
-        "build": "run-s watch:*",
+        "build": "run-s build:*",
         "build:css": "tailwindcss -i src/style.css -o src/assets/tailwind.css",
         "build:parcel": "parcel build",
         "watch": "run-p watch:*",
