@@ -3,7 +3,7 @@
 @import "tailwindcss/utilities";
 
 .card {
-    @apply flex-1 p-4 rounded shadow-md flex flex-col gap-2;
+    @apply flex-1 p-4 rounded shadow-md flex flex-col gap-2 bg-white;
 }
 .card p {
     @apply font-bold;
