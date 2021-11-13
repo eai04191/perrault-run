@@ -3,6 +3,12 @@
     <head>
         <meta charset="utf-8" />
         <title>スクショからステータスを読み取るPoC | Perrault.run 💨</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter&display=swap"
+            rel="stylesheet"
+        />
         <link rel="stylesheet" href="assets/tailwind.css" />
     </head>
     <body class="bg-gray-50 text-gray-900">
@@ -30,7 +36,19 @@
                         <canvas id="canvas2"></canvas>
                     </div>
                 </div>
+                <div class="card">
+                    <p>読み取り結果</p>
+                    <ul id="result"></ul>
+                </div>
             </div>
         </div>
+        <footer class="py-12 text-center border-t mt-16">
+            <a
+                href="https://github.com/eai04191/perrault-run"
+                target="_blank"
+                rel="noopener"
+                >GitHub</a
+            >
+        </footer>
     </body>
 </html>
