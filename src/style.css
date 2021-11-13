@@ -1,0 +1,13 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+.card {
+    @apply flex-1 p-4 rounded shadow-md flex flex-col gap-2;
+}
+.card p {
+    @apply font-bold;
+}
+.card canvas {
+    @apply w-full object-contain block;
+}
