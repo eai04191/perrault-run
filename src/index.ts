@@ -1,49 +1,49 @@
 document
     .querySelector<HTMLInputElement>("#filechooser")
     .addEventListener("input", async ({ target }) => {
-    const t = target as HTMLInputElement;
-    const { files } = t;
+        const t = target as HTMLInputElement;
+        const { files } = t;
 
-    // ファイルなければ中止
-    if (files.length === 0) return;
+        // ファイルなければ中止
+        if (files.length === 0) return;
 
-    const file = files[0];
+        const file = files[0];
 
-    // 画像じゃなければ中止
-    if (!file.type.match(/^image\/(png|jpeg|gif)$/)) {
-        alert('file is not image!');
-        return;
-    }
-
-    const dataURL = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const result = event.target.result;
-
-            if (typeof result !== 'string') {
-                // 軟骨うますぎ祭り開催中止
-                reject('dataURL should be string');
-                return;
-            }
-            resolve(result);
+        // 画像じゃなければ中止
+        if (!file.type.match(/^image\/(png|jpeg|gif)$/)) {
+            alert("file is not image!");
+            return;
         }
-        reader.readAsDataURL(file);
-    });
 
-    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-            resolve(img);
-        }
-        img.onerror = (e) => {
-            reject(e);
-        }
-        img.src = dataURL;
-    });
+        const dataURL = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const result = event.target.result;
 
-    // TODO: クロップ処理
-    // Galaxyにある#000000の余白とか
-    // 余裕があればAndroidエミュレーターのUI部分も
+                if (typeof result !== "string") {
+                    // 軟骨うますぎ祭り開催中止
+                    reject("dataURL should be string");
+                    return;
+                }
+                resolve(result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                resolve(img);
+            };
+            img.onerror = (e) => {
+                reject(e);
+            };
+            img.src = dataURL;
+        });
+
+        // TODO: クロップ処理
+        // Galaxyにある#000000の余白とか
+        // 余裕があればAndroidエミュレーターのUI部分も
 
         const canvas0 = document.querySelector<HTMLCanvasElement>("#canvas0");
         const canvas1 = document.querySelector<HTMLCanvasElement>("#canvas1");
@@ -53,36 +53,37 @@ document
         canvas0.width = image.width;
         canvas0.height = image.height;
         canvas0.getContext("2d").drawImage(image, 0, 0);
-    const canvasInfo = (() => {
-        if (image.width / image.height <= 16 / 9) {
-            // 16:9か
-            // 16:9より縦長
-            const height = image.width * (9 / 16)
-            return {
-                x: 0,
-                y: -(image.height - height) / 2,
-                width: image.width,
-                height: height
+
+        const canvasInfo = (() => {
+            if (image.width / image.height <= 16 / 9) {
+                // 16:9か
+                // 16:9より縦長
+                const height = image.width * (9 / 16);
+                return {
+                    x: 0,
+                    y: -(image.height - height) / 2,
+                    width: image.width,
+                    height: height,
+                };
+            } else {
+                // 16:9より横長
+                const width = image.height * (16 / 9);
+                return {
+                    // 右端
+                    x: -(image.width - width),
+                    y: 0,
+                    width: width,
+                    height: image.height,
+                };
             }
-        } else {
-            // 16:9より横長
-            const width = image.height * (16 / 9)
-            return {
-                // 右端
-                x: -(image.width - width),
-                y: 0,
-                width: width,
-                height: image.height,
-            }
-        }
-    })()
+        })();
 
         // console.log("canvas info", canvasInfo);
-    // canvas.width = canvasInfo.width;
+        // canvas.width = canvasInfo.width;
         canvas1.height = canvasInfo.height;
-    // ctx.drawImage(image, canvasInfo.x, canvasInfo.y);
+        // ctx.drawImage(image, canvasInfo.x, canvasInfo.y);
 
-    // 右半分だけ抽出
+        // 右半分だけ抽出
         canvas1.width = canvasInfo.width / 2;
         canvas1
             .getContext("2d")
@@ -98,8 +99,8 @@ document
 
         binarization(canvas2, 25 * 3);
 
-    // TODO: Lv検出, 誓約検出, キャラ名検出, ランク検出, ステータスOCR, アイテム検出
-})
+        // TODO: Lv検出, 誓約検出, キャラ名検出, ランク検出, ステータスOCR, アイテム検出
+    });
 
 /**
  * sourceCanvasをtargetCanvasのwidth, heightに沿うようにscaleしたtargetCanvasに描画する
@@ -167,7 +168,7 @@ function binarization(canvas: HTMLCanvasElement, threshold: number) {
         const y = (() => {
             if (和 < threshold || 和2 < threshold) {
                 return 255;
-        }
+            }
             return 0;
         })();
 
