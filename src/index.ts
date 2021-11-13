@@ -1,3 +1,4 @@
+import { rectangles, rectangles4K, rectangles4KLv } from "./rectangles";
 import { createWorker } from "tesseract.js";
 const worker = createWorker();
 (async () => {
@@ -115,43 +116,6 @@ document
         document.querySelector("#loading")?.classList.remove("hidden");
 
         const rectangles = [
-            {
-                label: "攻撃力",
-                left: 365,
-                top: 458,
-                width: 40,
-                height: 20,
-            },
-            {
-                label: "クリティカル",
-                left: 689,
-                top: 458,
-                width: 40,
-                height: 20,
-            },
-            {
-                label: "防御力",
-                left: 365,
-                top: 541,
-                width: 40,
-                height: 20,
-            },
-            {
-                label: "命中力",
-                left: 689,
-                top: 541,
-                width: 40,
-                height: 20,
-            },
-            {
-                label: "回避力",
-                left: 689,
-                top: 624,
-                width: 40,
-                height: 20,
-            },
-        ];
-
         for (let i = 0; i < rectangles.length; i++) {
             const {
                 data: { text },
