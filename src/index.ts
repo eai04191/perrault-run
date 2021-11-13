@@ -1,11 +1,11 @@
 document
-    .querySelector<HTMLInputElement>("#filechooser")
+    .querySelector<HTMLInputElement>("#filechooser")!
     .addEventListener("input", async ({ target }) => {
         const t = target as HTMLInputElement;
         const { files } = t;
 
         // ファイルなければ中止
-        if (files.length === 0) return;
+        if (!files || files.length === 0) return;
 
         const file = files[0];
 
@@ -18,7 +18,7 @@ document
         const dataURL = await new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (event) => {
-                const result = event.target.result;
+                const result = event.target?.result;
 
                 if (typeof result !== "string") {
                     // 軟骨うますぎ祭り開催中止
@@ -45,14 +45,14 @@ document
         // Galaxyにある#000000の余白とか
         // 余裕があればAndroidエミュレーターのUI部分も
 
-        const canvas0 = document.querySelector<HTMLCanvasElement>("#canvas0");
-        const canvas1 = document.querySelector<HTMLCanvasElement>("#canvas1");
-        const canvas2 = document.querySelector<HTMLCanvasElement>("#canvas2");
+        const canvas0 = document.querySelector<HTMLCanvasElement>("#canvas0")!;
+        const canvas1 = document.querySelector<HTMLCanvasElement>("#canvas1")!;
+        const canvas2 = document.querySelector<HTMLCanvasElement>("#canvas2")!;
 
         // オリジナル画像を描画
         canvas0.width = image.width;
         canvas0.height = image.height;
-        canvas0.getContext("2d").drawImage(image, 0, 0);
+        canvas0.getContext("2d")!.drawImage(image, 0, 0);
 
         const canvasInfo = (() => {
             if (image.width / image.height <= 16 / 9) {
@@ -86,7 +86,7 @@ document
         // 右半分だけ抽出
         canvas1.width = canvasInfo.width / 2;
         canvas1
-            .getContext("2d")
+            .getContext("2d")!
             .drawImage(
                 image,
                 canvasInfo.x - canvasInfo.width / 2,
@@ -117,8 +117,8 @@ function copyAndScaleCanvas(
     targetCanvas.setAttribute("height", aimedHeight.toString());
     // 目標値への拡縮倍率。いい名前が思いつかない
     const n = aimedHeight / sorceCanvas.height;
-    targetCanvas.getContext("2d").scale(n, n);
-    targetCanvas.getContext("2d").drawImage(sorceCanvas, 0, 0);
+    targetCanvas.getContext("2d")!.scale(n, n);
+    targetCanvas.getContext("2d")!.drawImage(sorceCanvas, 0, 0);
 }
 
 function binarization(canvas: HTMLCanvasElement, threshold: number) {
@@ -146,7 +146,7 @@ function binarization(canvas: HTMLCanvasElement, threshold: number) {
         g: 183,
         b: 183,
     };
-    const c = canvas.getContext("2d");
+    const c = canvas.getContext("2d")!;
     const src = c.getImageData(0, 0, canvas.width, canvas.height);
     const dst = c.createImageData(canvas.width, canvas.height);
 
