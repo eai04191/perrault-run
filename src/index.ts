@@ -6,6 +6,9 @@ const worker = createWorker();
     await worker.load();
     await worker.loadLanguage("eng");
     await worker.initialize("eng");
+    await worker.setParameters({
+        tessedit_char_whitelist: "0123456789",
+    });
     console.timeEnd("tesseract");
     document.querySelector("#filechooser")?.removeAttribute("disabled");
 })();
@@ -62,6 +65,7 @@ document
         const canvas0 = document.querySelector<HTMLCanvasElement>("#canvas0")!;
         const canvas1 = document.querySelector<HTMLCanvasElement>("#canvas1")!;
         const canvas2 = document.querySelector<HTMLCanvasElement>("#canvas2")!;
+        const canvas3 = document.querySelector<HTMLCanvasElement>("#canvas3")!;
 
         // オリジナル画像を描画
         canvas0.width = image.width;
@@ -107,20 +111,30 @@ document
                 canvasInfo.y
             );
 
-        canvas2.width = 1920 / 2;
-        canvas2.height = 1080;
+        // canvas2.width = 1920 / 2;
+        // canvas2.height = 1080;
+        canvas2.width = (1920 / 2) * 2;
+        canvas2.height = 1080 * 2;
         copyAndScaleCanvas(canvas1, canvas2);
 
-        binarization(canvas2, 40 * 3);
+        // copy
+        // canvas3.width = 1920 / 2;
+        // canvas3.height = 1080;
+        canvas3.width = (1920 / 2) * 2;
+        canvas3.height = 1080 * 2;
+        canvas3.getContext("2d")!.drawImage(canvas2, 0, 0);
+
+        binarization(canvas3, 50 * 3);
 
         document.querySelector("#loading")?.classList.remove("hidden");
 
-        const rectangles = [
-        for (let i = 0; i < rectangles.length; i++) {
+        for (let i = 0; i < rectangles4K.length; i++) {
             const {
                 data: { text },
-            } = await worker.recognize(canvas2, { rectangle: rectangles[i] });
-            appendResult(`${rectangles[i].label}: ${text}`);
+            } = await worker.recognize(canvas3, {
+                rectangle: rectangles4K[i],
+            });
+            appendResult(`${rectangles4K[i].label}: ${text}`);
             document.querySelector("#loading")?.classList.add("hidden");
         }
 
@@ -157,9 +171,9 @@ function binarization(canvas: HTMLCanvasElement, threshold: number) {
         // r: 255, g: 255, b: 255
 
         // ステータスLvの数字
-        r: 224,
-        g: 224,
-        b: 224,
+        r: 218,
+        g: 218,
+        b: 218,
     };
     // const targetRGB2 = {
     //     // キャラ名のオレンジ
