@@ -1,6 +1,19 @@
+import { createWorker } from "tesseract.js";
+const worker = createWorker();
+(async () => {
+    console.time("tesseract");
+    await worker.load();
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+    console.timeEnd("tesseract");
+    document.querySelector("#filechooser")?.removeAttribute("disabled");
+})();
+
 document
     .querySelector<HTMLInputElement>("#filechooser")!
     .addEventListener("input", async ({ target }) => {
+        resetResult();
+
         const t = target as HTMLInputElement;
         const { files } = t;
 
@@ -97,7 +110,57 @@ document
         canvas2.height = 1080;
         copyAndScaleCanvas(canvas1, canvas2);
 
-        binarization(canvas2, 25 * 3);
+        binarization(canvas2, 40 * 3);
+
+        document.querySelector("#loading")?.classList.remove("hidden");
+
+        const rectangles = [
+            {
+                label: "攻撃力",
+                left: 365,
+                top: 458,
+                width: 40,
+                height: 20,
+            },
+            {
+                label: "クリティカル",
+                left: 689,
+                top: 458,
+                width: 40,
+                height: 20,
+            },
+            {
+                label: "防御力",
+                left: 365,
+                top: 541,
+                width: 40,
+                height: 20,
+            },
+            {
+                label: "命中力",
+                left: 689,
+                top: 541,
+                width: 40,
+                height: 20,
+            },
+            {
+                label: "回避力",
+                left: 689,
+                top: 624,
+                width: 40,
+                height: 20,
+            },
+        ];
+
+        for (let i = 0; i < rectangles.length; i++) {
+            const {
+                data: { text },
+            } = await worker.recognize(canvas2, { rectangle: rectangles[i] });
+            appendResult(`${rectangles[i].label}: ${text}`);
+            document.querySelector("#loading")?.classList.add("hidden");
+        }
+
+        // await worker.terminate();
 
         // TODO: Lv検出, 誓約検出, キャラ名検出, ランク検出, ステータスOCR, アイテム検出
     });
@@ -130,22 +193,22 @@ function binarization(canvas: HTMLCanvasElement, threshold: number) {
         // r: 255, g: 255, b: 255
 
         // ステータスLvの数字
-        r: 222,
-        g: 222,
-        b: 222,
+        r: 224,
+        g: 224,
+        b: 224,
     };
-    const targetRGB2 = {
-        // キャラ名のオレンジ
-        // r: 255, g: 207, b: 4
+    // const targetRGB2 = {
+    //     // キャラ名のオレンジ
+    //     // r: 255, g: 207, b: 4
 
-        // Lvの数字
-        // r: 255, g: 255, b: 255
+    //     // Lvの数字
+    //     // r: 255, g: 255, b: 255
 
-        // ステータスLvの数字のふち
-        r: 183,
-        g: 183,
-        b: 183,
-    };
+    //     // ステータスLvの数字のふち
+    //     r: 140,
+    //     g: 140,
+    //     b: 140,
+    // };
     const c = canvas.getContext("2d")!;
     const src = c.getImageData(0, 0, canvas.width, canvas.height);
     const dst = c.createImageData(canvas.width, canvas.height);
@@ -161,12 +224,13 @@ function binarization(canvas: HTMLCanvasElement, threshold: number) {
             Math.abs(r - targetRGB.r) +
             Math.abs(g - targetRGB.g) +
             Math.abs(b - targetRGB.b);
-        const 和2 =
-            Math.abs(r - targetRGB2.r) +
-            Math.abs(g - targetRGB2.g) +
-            Math.abs(b - targetRGB2.b);
+        // const 和2 =
+        //     Math.abs(r - targetRGB2.r) +
+        //     Math.abs(g - targetRGB2.g) +
+        //     Math.abs(b - targetRGB2.b);
         const y = (() => {
-            if (和 < threshold || 和2 < threshold) {
+            // if (和 < threshold || 和2 < threshold) {
+            if (和 < threshold) {
                 return 255;
             }
             return 0;
@@ -178,4 +242,14 @@ function binarization(canvas: HTMLCanvasElement, threshold: number) {
         dst.data[i + 3] = a;
     }
     c.putImageData(dst, 0, 0);
+}
+
+function resetResult() {
+    const result = document.querySelector("#result");
+    result!.innerHTML = "";
+}
+
+function appendResult(text: string) {
+    const result = document.querySelector("#result");
+    result!.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
 }
