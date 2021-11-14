@@ -12,6 +12,7 @@ import {
     appendResult,
     resetResult,
 } from "./ui";
+import { opencvjsReady, tesseractjsReady } from "./loading";
 
 import { createWorker } from "tesseract.js";
 // @ts-ignore
@@ -19,19 +20,18 @@ import opencvjs, { CV } from "@techstark/opencv-js";
 const cv = opencvjs as CV;
 
 cv.onRuntimeInitialized = () => {
-    alert("opencv-js ready!");
+    opencvjsReady();
 };
 
 const worker = createWorker();
 (async () => {
-    console.time("tesseract");
     await worker.load();
     await worker.loadLanguage("eng");
     await worker.initialize("eng");
     await worker.setParameters({
         tessedit_char_whitelist: "0123456789",
     });
-    console.timeEnd("tesseract");
+    tesseractjsReady();
     filechooser.removeAttribute("disabled");
 })();
 

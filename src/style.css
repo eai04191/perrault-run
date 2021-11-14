@@ -14,3 +14,14 @@
 .card canvas {
     @apply w-full object-contain block;
 }
+
+.library-loading-status li {
+    @apply text-gray-600 gap-2 flex pl-6;
+
+    background-image: url("https://s2.svgbox.net/loaders.svg?ic=spinner&color=gray-600");
+    @apply bg-no-repeat;
+
+    &.loaded {
+        background-image: url("https://s2.svgbox.net/octicons.svg?ic=check&color=gray-600");
+    }
+}
