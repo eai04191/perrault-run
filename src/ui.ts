@@ -36,3 +36,10 @@ export function resetResult() {
 export function appendResult(text: string) {
     result.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
 }
+
+document.querySelectorAll(".card").forEach((card) =>
+    card.addEventListener("click", () => {
+        const c = card.classList;
+        c.toggle("expanded");
+    })
+);
