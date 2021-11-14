@@ -18,6 +18,7 @@
         "prettier": "^2.4.1"
     },
     "dependencies": {
+        "@techstark/opencv-js": "^4.5.4-release.1",
         "autoprefixer": "^10.4.0",
         "postcss": "^8.3.11",
         "tailwindcss": "^2.2.19",

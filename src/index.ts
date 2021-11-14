@@ -14,6 +14,14 @@ import {
 } from "./ui";
 
 import { createWorker } from "tesseract.js";
+// @ts-ignore
+import opencvjs, { CV } from "@techstark/opencv-js";
+const cv = opencvjs as CV;
+
+cv.onRuntimeInitialized = () => {
+    alert("opencv-js ready!");
+};
+
 const worker = createWorker();
 (async () => {
     console.time("tesseract");
