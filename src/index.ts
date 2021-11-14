@@ -15,13 +15,10 @@ import {
 import { opencvjsReady, tesseractjsReady } from "./loading";
 
 import { createWorker } from "tesseract.js";
-// @ts-ignore
-import opencvjs, { CV } from "@techstark/opencv-js";
-const cv = opencvjs as CV;
 
-cv.onRuntimeInitialized = () => {
-    opencvjsReady();
-};
+// cv.onRuntimeInitialized = () => {
+//     opencvjsReady();
+// };
 
 const worker = createWorker();
 (async () => {
