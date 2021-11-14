@@ -9,7 +9,7 @@
     @apply fixed inset-0 m-4;
 }
 .card p {
-    @apply font-bold;
+    @apply font-bold select-none;
 }
 .card canvas {
     @apply w-full object-contain block;
