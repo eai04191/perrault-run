@@ -1,4 +1,18 @@
 import { rectangles, rectangles4K, rectangles4KLv } from "./rectangles";
+import {
+    canvas0,
+    canvas1,
+    canvas2,
+    canvas3,
+    ctx0,
+    ctx1,
+    ctx3,
+    filechooser,
+    loading,
+    appendResult,
+    resetResult,
+} from "./ui";
+
 import { createWorker } from "tesseract.js";
 const worker = createWorker();
 (async () => {
@@ -10,138 +24,125 @@ const worker = createWorker();
         tessedit_char_whitelist: "0123456789",
     });
     console.timeEnd("tesseract");
-    document.querySelector("#filechooser")?.removeAttribute("disabled");
+    filechooser.removeAttribute("disabled");
 })();
 
-document
-    .querySelector<HTMLInputElement>("#filechooser")!
-    .addEventListener("input", async ({ target }) => {
-        resetResult();
+filechooser.addEventListener("input", async ({ target }) => {
+    resetResult();
 
-        const t = target as HTMLInputElement;
-        const { files } = t;
+    const t = target as HTMLInputElement;
+    const { files } = t;
 
-        // ファイルなければ中止
-        if (!files || files.length === 0) return;
+    // ファイルなければ中止
+    if (!files || files.length === 0) return;
 
-        const file = files[0];
+    const file = files[0];
 
-        // 画像じゃなければ中止
-        if (!file.type.match(/^image\/(png|jpeg|gif)$/)) {
-            alert("file is not image!");
-            return;
-        }
+    // 画像じゃなければ中止
+    if (!file.type.match(/^image\/(png|jpeg|gif)$/)) {
+        alert("file is not image!");
+        return;
+    }
 
-        const dataURL = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const result = event.target?.result;
+    const dataURL = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const result = event.target?.result;
 
-                if (typeof result !== "string") {
-                    // 軟骨うますぎ祭り開催中止
-                    reject("dataURL should be string");
-                    return;
-                }
-                resolve(result);
-            };
-            reader.readAsDataURL(file);
-        });
-
-        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                resolve(img);
-            };
-            img.onerror = (e) => {
-                reject(e);
-            };
-            img.src = dataURL;
-        });
-
-        // TODO: クロップ処理
-        // Galaxyにある#000000の余白とか
-        // 余裕があればAndroidエミュレーターのUI部分も
-
-        const canvas0 = document.querySelector<HTMLCanvasElement>("#canvas0")!;
-        const canvas1 = document.querySelector<HTMLCanvasElement>("#canvas1")!;
-        const canvas2 = document.querySelector<HTMLCanvasElement>("#canvas2")!;
-        const canvas3 = document.querySelector<HTMLCanvasElement>("#canvas3")!;
-
-        // オリジナル画像を描画
-        canvas0.width = image.width;
-        canvas0.height = image.height;
-        canvas0.getContext("2d")!.drawImage(image, 0, 0);
-
-        const canvasInfo = (() => {
-            if (image.width / image.height <= 16 / 9) {
-                // 16:9か
-                // 16:9より縦長
-                const height = image.width * (9 / 16);
-                return {
-                    x: 0,
-                    y: -(image.height - height) / 2,
-                    width: image.width,
-                    height: height,
-                };
-            } else {
-                // 16:9より横長
-                const width = image.height * (16 / 9);
-                return {
-                    // 右端
-                    x: -(image.width - width),
-                    y: 0,
-                    width: width,
-                    height: image.height,
-                };
+            if (typeof result !== "string") {
+                // 軟骨うますぎ祭り開催中止
+                reject("dataURL should be string");
+                return;
             }
-        })();
-
-        // console.log("canvas info", canvasInfo);
-        // canvas.width = canvasInfo.width;
-        canvas1.height = canvasInfo.height;
-        // ctx.drawImage(image, canvasInfo.x, canvasInfo.y);
-
-        // 右半分だけ抽出
-        canvas1.width = canvasInfo.width / 2;
-        canvas1
-            .getContext("2d")!
-            .drawImage(
-                image,
-                canvasInfo.x - canvasInfo.width / 2,
-                canvasInfo.y
-            );
-
-        // canvas2.width = 1920 / 2;
-        // canvas2.height = 1080;
-        canvas2.width = (1920 / 2) * 2;
-        canvas2.height = 1080 * 2;
-        copyAndScaleCanvas(canvas1, canvas2);
-
-        // copy
-        // canvas3.width = 1920 / 2;
-        // canvas3.height = 1080;
-        canvas3.width = (1920 / 2) * 2;
-        canvas3.height = 1080 * 2;
-        canvas3.getContext("2d")!.drawImage(canvas2, 0, 0);
-
-        binarization(canvas3, 50 * 3);
-
-        document.querySelector("#loading")?.classList.remove("hidden");
-
-        for (let i = 0; i < rectangles4K.length; i++) {
-            const {
-                data: { text },
-            } = await worker.recognize(canvas3, {
-                rectangle: rectangles4K[i],
-            });
-            appendResult(`${rectangles4K[i].label}: ${text}`);
-            document.querySelector("#loading")?.classList.add("hidden");
-        }
-
-        // await worker.terminate();
-
-        // TODO: Lv検出, 誓約検出, キャラ名検出, ランク検出, ステータスOCR, アイテム検出
+            resolve(result);
+        };
+        reader.readAsDataURL(file);
     });
+
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve(img);
+        };
+        img.onerror = (e) => {
+            reject(e);
+        };
+        img.src = dataURL;
+    });
+
+    // TODO: クロップ処理
+    // Galaxyにある#000000の余白とか
+    // 余裕があればAndroidエミュレーターのUI部分も
+
+    // オリジナル画像を描画
+    canvas0.width = image.width;
+    canvas0.height = image.height;
+    ctx0.drawImage(image, 0, 0);
+
+    const canvasInfo = (() => {
+        if (image.width / image.height <= 16 / 9) {
+            // 16:9か
+            // 16:9より縦長
+            const height = image.width * (9 / 16);
+            return {
+                x: 0,
+                y: -(image.height - height) / 2,
+                width: image.width,
+                height: height,
+            };
+        } else {
+            // 16:9より横長
+            const width = image.height * (16 / 9);
+            return {
+                // 右端
+                x: -(image.width - width),
+                y: 0,
+                width: width,
+                height: image.height,
+            };
+        }
+    })();
+
+    // console.log("canvas info", canvasInfo);
+    // canvas.width = canvasInfo.width;
+    canvas1.height = canvasInfo.height;
+    // ctx.drawImage(image, canvasInfo.x, canvasInfo.y);
+
+    // 右半分だけ抽出
+    canvas1.width = canvasInfo.width / 2;
+    ctx1.drawImage(image, canvasInfo.x - canvasInfo.width / 2, canvasInfo.y);
+
+    // canvas2.width = 1920 / 2;
+    // canvas2.height = 1080;
+    canvas2.width = (1920 / 2) * 2;
+    canvas2.height = 1080 * 2;
+    copyAndScaleCanvas(canvas1, canvas2);
+
+    // copy
+    // canvas3.width = 1920 / 2;
+    // canvas3.height = 1080;
+    canvas3.width = (1920 / 2) * 2;
+    canvas3.height = 1080 * 2;
+    ctx3.drawImage(canvas2, 0, 0);
+
+    binarization(canvas3, 50 * 3);
+
+    loading.classList.remove("hidden");
+
+    for (let i = 0; i < rectangles4K.length; i++) {
+        const {
+            data: { text },
+        } = await worker.recognize(canvas3, {
+            rectangle: rectangles4K[i],
+        });
+        appendResult(`${rectangles4K[i].label}: ${text}`);
+        loading.classList.add("hidden");
+    }
+
+    // await worker.terminate();
+
+    // TODO: Lv検出, 誓約検出, キャラ名検出, ランク検出, ステータスOCR, アイテム検出
+});
 
 /**
  * sourceCanvasをtargetCanvasのwidth, heightに沿うようにscaleしたtargetCanvasに描画する
@@ -220,14 +221,4 @@ function binarization(canvas: HTMLCanvasElement, threshold: number) {
         dst.data[i + 3] = a;
     }
     c.putImageData(dst, 0, 0);
-}
-
-function resetResult() {
-    const result = document.querySelector("#result");
-    result!.innerHTML = "";
-}
-
-function appendResult(text: string) {
-    const result = document.querySelector("#result");
-    result!.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
 }
